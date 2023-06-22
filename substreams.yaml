@@ -11,12 +11,6 @@ binaries:
     type: wasm/rust-v1
     file: target/wasm32-unknown-unknown/release/substreams.wasm
 
-protobuf:
-  files:
-    - uniswap.proto
-  importPaths:
-    - ./proto/nascent/uniswap/v1
-
 modules:
   - name: map_liquidity
     kind: map
