@@ -13,8 +13,8 @@ build:
 protogen:
 	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google"
 
-.PHONY: pack
-pack:
+.PHONY: package
+package:
 	substreams pack
 
 .PHONY: stream
@@ -24,4 +24,3 @@ stream: build
 .PHONE: sink_postgres
 sink_postgres: package
 	substreams-sink-postgres setup --ignore-duplicate-table-errors "$(POSTGRESQL_DSN)" schema.sql
-	substreams-sink-postgres run $(POSTGRESQL_DSN) $(ENDPOINT) "substreams.spkg" db_out
