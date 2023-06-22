@@ -1,0 +1,28 @@
+specVersion: v0.1.0
+package:
+  name: nascent_uniswap_v3_liquidity
+  version: v0.0.1
+
+imports:
+  uniswap_v3: https://github.com/streamingfast/substreams-uniswap-v3/releases/download/v0.2.7/substreams.spkg
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: target/wasm32-unknown-unknown/release/substreams.wasm
+
+protobuf:
+  files:
+    - uniswap.proto
+  importPaths:
+    - ./proto/nascent/uniswap/v1
+
+modules:
+  - name: map_liquidity
+    kind: map
+    initialBlock: 12369621
+    inputs:
+      - store: uniswap_v3:store_pool_liquidities
+        mode: deltas
+    output:
+      type: proto:nascent.uniswap.v1.PoolLiquidities

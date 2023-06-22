@@ -1,0 +1,23 @@
+[package]
+name = "substreams-uniswap-v3-liquidity"
+version = "0.1.0"
+description = "Uniswap v3 Liquitidy Extractor"
+edition = "2021"
+
+[lib]
+name = "substreams"
+crate-type = ["cdylib"]
+
+[dependencies]
+prost = "0.11"
+prost-types = "0.11"
+substreams = "0.5"
+substreams-ethereum = "0.9"
+
+[build-dependencies]
+prost-build = "0.11"
+anyhow = "1"
+substreams-ethereum = "0.9"
+
+[patch.crates-io]
+substreams = { git = "https://github.com/streamingfast/substreams-rs", branch = "develop" }
