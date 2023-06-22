@@ -7,6 +7,22 @@ message PoolLiquidities {
 }
 
 message PoolLiquidity {
-    string address = 1;
-    string liquidity = 2;
+    string address = 1; // lui
+    string liquidity = 2; // lui
+    string current_tick = 3;
+    Token token0 = 4; // lui
+    Token token1 = 5; // lui
+    PoolTickState tick_state = 6;
+}
+
+message PoolTickState {
+    int32 tick_lower_tick_idx = 1;
+    int32 tick_upper_tick_idx = 2;
+    string tick_liquidity = 3;
+}
+
+message Token {
+    string address =1;
+    string symbol = 2;
+    uint64 decimals = 3;
 }

@@ -11,7 +11,7 @@ build:
 
 .PHONY: protogen
 protogen:
-	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google,uniswap/v1/"
+	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google"
 
 .PHONY: pack
 pack:

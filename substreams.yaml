@@ -5,6 +5,7 @@ package:
 
 imports:
   uniswap_v3: https://github.com/streamingfast/substreams-uniswap-v3/releases/download/v0.2.7/substreams.spkg
+  database_change: https://github.com/streamingfast/substreams-database-change/releases/download/v1.1.1/substreams-database-change-v1.1.1.spkg
 
 binaries:
   default:
@@ -18,11 +19,10 @@ protobuf:
     - ./proto/nascent/uniswap/v1
 
 modules:
-  - name: map_liquidity
+  - name: db_out
     kind: map
     initialBlock: 12369621
     inputs:
-      - store: uniswap_v3:store_pool_liquidities
-        mode: deltas
+      - map: uniswap_v3:map_extract_data_types
     output:
-      type: proto:nascent.uniswap.v1.PoolLiquidities
+      type: proto:sf.substreams.sink.database.v1.DatabaseChanges
