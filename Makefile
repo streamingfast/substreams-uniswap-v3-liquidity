@@ -1,8 +1,9 @@
 ENDPOINT ?= mainnet.eth.streamingfast.io:443
 START_BLOCK ?= 12369621
 STOP_BLOCK ?= +500
-ROOT_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-KV_DSN ?= badger3://$(ROOT_DIR)/kv.db
+
+# substreams-sink-postgres
+POSTGRESQL_DSN ?= psql://dev-node:insecure-change-me-in-prod@localhost:5432/dev-node?sslmode=disable
 
 .PHONY: build
 build:
@@ -19,3 +20,8 @@ pack:
 .PHONY: stream
 stream: build
 	substreams run -e $(ENDPOINT) substreams.yaml map_liquidity -s $(START_BLOCK) -t $(STOP_BLOCK)
+
+.PHONE: sink_postgres
+sink_postgres: package
+	substreams-sink-postgres setup --ignore-duplicate-table-errors "$(POSTGRESQL_DSN)" schema.sql
+	substreams-sink-postgres run $(POSTGRESQL_DSN) $(ENDPOINT) "substreams.spkg" db_out
