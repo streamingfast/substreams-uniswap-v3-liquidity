@@ -24,3 +24,4 @@ stream: build
 .PHONE: sink_postgres
 sink_postgres: package
 	substreams-sink-postgres setup --ignore-duplicate-table-errors "$(POSTGRESQL_DSN)" schema.sql
+	substreams-sink-postgres run $(POSTGRESQL_DSN) $(ENDPOINT) "substreams.yaml" db_out
