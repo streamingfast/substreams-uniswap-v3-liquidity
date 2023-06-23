@@ -1,5 +1,5 @@
 ENDPOINT ?= mainnet.eth.streamingfast.io:443
-START_BLOCK ?= 12369621
+START_BLOCK ?= 17000000
 STOP_BLOCK ?= +500
 
 # substreams-sink-postgres
@@ -11,17 +11,17 @@ build:
 
 .PHONY: protogen
 protogen:
-	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google"
+	substreams protogen ./substreams.yaml --exclude-paths="sf/substreams,google,database.proto"
 
 .PHONY: package
-package:
+package: build
 	substreams pack
 
 .PHONY: stream
 stream: build
-	substreams run -e $(ENDPOINT) substreams.yaml map_liquidity -s $(START_BLOCK) -t $(STOP_BLOCK)
+	substreams run -e $(ENDPOINT) substreams.yaml db_out -s $(START_BLOCK) -t $(STOP_BLOCK)
 
 .PHONE: sink_postgres
-sink_postgres: package
+sink_postgres: build
 	substreams-sink-postgres setup --ignore-duplicate-table-errors "$(POSTGRESQL_DSN)" schema.sql
 	substreams-sink-postgres run $(POSTGRESQL_DSN) $(ENDPOINT) "substreams.yaml" db_out

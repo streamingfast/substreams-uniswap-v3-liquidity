@@ -1,6 +1,6 @@
 specVersion: v0.1.0
 package:
-  name: nascent_uniswap_v3_liquidity
+  name: uniswap_v3_liquidity
   version: v0.0.1
 
 imports:
@@ -17,6 +17,12 @@ modules:
     kind: map
     initialBlock: 12369621
     inputs:
+      - source: sf.substreams.v1.Clock
       - map: uniswap_v3:map_extract_data_types
+      - map: uniswap_v3:map_pools_created
+      - store: uniswap_v3:store_pool_sqrt_price
+        mode: deltas
+      - store: uniswap_v3:store_pool_liquidities
+        mode: deltas
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges

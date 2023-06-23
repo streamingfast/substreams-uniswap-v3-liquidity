@@ -8,20 +8,30 @@ create table pool (
     token1_decimals integer
 );
 
-create table liquidity (
+create table position (
+    id text not null constraint position_pk primary key,
+    pool_address text,
+    tick_lower_idx integer,
+    tick_upper_idx integer
+);
+
+create table pool_tick (
     pool_address text,
     block_number integer,
-    liquidity   decimal,
-    current_tick integer,
-    tick_lower_tick_idx integer,
-    tick_upper_tick_idx integer,
-    tick_liquidity decimal,
+    tick decimal,
     PRIMARY KEY(pool_address, block_number)
 );
 
-create table cursors (
-    id         text not null constraint cursor_pk primary key,
-    cursor     text,
-    block_num  bigint,
-    block_id   text
+create table pool_liquidity (
+    pool_address text,
+    block_number integer,
+    liquidity decimal,
+    PRIMARY KEY(pool_address, block_number)
+);
+
+create table position_liquidity (
+    position_id text,
+    block_number integer,
+    liquidity decimal,
+    PRIMARY KEY(position_id, block_number)
 );
