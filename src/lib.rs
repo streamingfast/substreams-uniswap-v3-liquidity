@@ -2,7 +2,7 @@ mod pb;
 
 use crate::pb::uniswap::types::v1::events::PoolSqrtPrice;
 use crate::pb::uniswap::types::v1::{Events, Pools};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use substreams::errors::Error;
 use substreams::key;
 use substreams::key::key_first_segment_in;
@@ -20,6 +20,10 @@ pub fn db_out(
     pool_sqrt_price_deltas: Deltas<DeltaProto<PoolSqrtPrice>>, /* store_pool_sqrt_price */
     pool_liquidities_store_deltas: Deltas<DeltaBigInt>, /* store_pool_liquidities */
 ) -> Result<DatabaseChanges, Error> {
+    let mut pool_keys: HashSet<String> = HashSet::<String>::new();
+    let mut position_keys: HashSet<String> = HashSet::<String>::new();
+    let mut tick_keys: HashSet<String> = HashSet::<String>::new();
+
     let mut tables = Tables::new();
 
     // Pool
@@ -36,11 +40,10 @@ pub fn db_out(
             .set("token1_symbol", token1.symbol)
             .set("token1_decimals", token1.decimals);
 
+        let liquidity_key = format!("{}:{}", &pool.address, clock.number);
+        pool_keys.insert(liquidity_key.clone());
         tables
-            .create_row(
-                "pool_liquidity",
-                format!("{}:{}", &pool.address, clock.number),
-            )
+            .create_row("pool_liquidity", liquidity_key)
             .set("liquidity", "0");
     }
 
@@ -49,12 +52,15 @@ pub fn db_out(
         .iter()
         .filter(key_first_segment_in("pool"))
     {
-        tables
-            .update_row(
-                "pool_liquidity",
-                format!("{}:{}", key::segment(&delta.key, 1), clock.number),
-            )
-            .set("liquidity", &delta.new_value);
+        let liquidity_key: String = format!("{}:{}", key::segment(&delta.key, 1), clock.number);
+        let row = if pool_keys.contains(&liquidity_key) {
+            tables.update_row("pool_liquidity", liquidity_key)
+        } else {
+            pool_keys.insert(liquidity_key.clone());
+            tables.create_row("pool_liquidity", liquidity_key)
+        };
+
+        row.set("liquidity", &delta.new_value);
     }
 
     for delta in pool_sqrt_price_deltas
@@ -62,12 +68,15 @@ pub fn db_out(
         .iter()
         .filter(key_first_segment_in("pool"))
     {
-        tables
-            .create_row(
-                "pool_tick",
-                format!("{}:{}", key::segment(&delta.key, 1), clock.number),
-            )
-            .set("tick", &delta.new_value.tick);
+        let tick_key: String = format!("{}:{}", key::segment(&delta.key, 1), clock.number);
+        let row = if tick_keys.contains(&tick_key) {
+            tables.update_row("pool_tick", tick_key)
+        } else {
+            tick_keys.insert(tick_key.clone());
+            tables.create_row("pool_tick", tick_key)
+        };
+
+        row.set("tick", &delta.new_value.tick);
     }
 
     for position in events.created_positions.into_iter() {
@@ -77,30 +86,35 @@ pub fn db_out(
             .set("tick_lower_idx", position.tick_lower)
             .set("tick_upper_idx", position.tick_upper);
 
+        let liquidity_key: String = format!("{}:{}", &position.token_id, clock.number);
+        position_keys.insert(liquidity_key.clone());
         tables
-            .create_row(
-                "position_liquidity",
-                format!("{}:{}", &position.token_id, clock.number),
-            )
+            .create_row("position_liquidity", liquidity_key)
             .set("liquidity", "0");
     }
 
     for position in events.increase_liquidity_positions.into_iter() {
-        tables
-            .update_row(
-                "position_liquidity",
-                format!("{}:{}", position.token_id, clock.number),
-            )
-            .set("liquidity", position.liquidity);
+        let liquidity_key: String = format!("{}:{}", position.token_id, clock.number);
+        let row = if position_keys.contains(&liquidity_key) {
+            tables.update_row("position_liquidity", liquidity_key)
+        } else {
+            position_keys.insert(liquidity_key.clone());
+            tables.create_row("position_liquidity", liquidity_key)
+        };
+
+        row.set("liquidity", position.liquidity);
     }
 
     for position in events.decrease_liquidity_positions.into_iter() {
-        tables
-            .update_row(
-                "position_liquidity",
-                format!("{}:{}", position.token_id, clock.number),
-            )
-            .set("liquidity", position.liquidity);
+        let liquidity_key: String = format!("{}:{}", position.token_id, clock.number);
+        let row = if position_keys.contains(&liquidity_key) {
+            tables.update_row("position_liquidity", liquidity_key)
+        } else {
+            position_keys.insert(liquidity_key.clone());
+            tables.create_row("position_liquidity", liquidity_key)
+        };
+
+        row.set("liquidity", position.liquidity);
     }
 
     Ok(fix_composite_keys(tables.to_database_changes()))
