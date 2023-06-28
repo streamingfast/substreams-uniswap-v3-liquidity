@@ -1,6 +1,6 @@
 [package]
 name = "substreams-uniswap-v3-liquidity"
-version = "0.1.0"
+version = "0.0.2"
 description = "Uniswap v3 Liquitidy Extractor"
 edition = "2021"
 

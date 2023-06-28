@@ -1,7 +1,7 @@
 specVersion: v0.1.0
 package:
   name: uniswap_v3_liquidity
-  version: v0.0.1
+  version: v0.0.2
 
 imports:
   uniswap_v3: https://github.com/streamingfast/substreams-uniswap-v3/releases/download/v0.2.7/substreams.spkg
