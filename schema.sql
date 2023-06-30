@@ -35,3 +35,12 @@ create table position_liquidity (
     liquidity decimal,
     PRIMARY KEY(position_id, block_number)
 );
+
+create index pool_token0_symbol_idx on pool(token0_symbol);
+create index pool_token1_symbol_idx on pool(token1_symbol);
+create index position_liquidity_position_id_idx on position_liquidity(position_id);
+create index position_liquidity_block_number_idx on position_liquidity(block_number);
+create index position_liquidity_liquidity_idx on position_liquidity(liquidity);
+create index pool_liquidity_block_number_idx on pool_liquidity(block_number);
+create index pool_liquidity_pool_address_idx on pool_liquidity(pool_address);
+create index pool_liquidity_liquidity_idx on pool_liquidity(liquidity);

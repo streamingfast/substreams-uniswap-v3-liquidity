@@ -13,6 +13,13 @@ binaries:
     file: target/wasm32-unknown-unknown/release/substreams.wasm
 
 modules:
+  - name: store_position_liquidities
+    kind: store
+    updatePolicy: add
+    valueType: bigint
+    inputs:
+      - map: uniswap_v3:map_extract_data_types
+
   - name: db_out
     kind: map
     initialBlock: 12369621
@@ -23,6 +30,8 @@ modules:
       - store: uniswap_v3:store_pool_sqrt_price
         mode: deltas
       - store: uniswap_v3:store_pool_liquidities
+        mode: deltas
+      - store: store_position_liquidities
         mode: deltas
     output:
       type: proto:sf.substreams.sink.database.v1.DatabaseChanges

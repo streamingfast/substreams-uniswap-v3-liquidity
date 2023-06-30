@@ -1,5 +1,5 @@
 ENDPOINT ?= mainnet.eth.streamingfast.io:443
-START_BLOCK ?= 17000000
+START_BLOCK ?= 12370000
 STOP_BLOCK ?= +500
 
 # substreams-sink-postgres
@@ -16,6 +16,10 @@ protogen:
 .PHONY: package
 package: build
 	substreams pack
+
+.PHONY: gui
+gui: build
+	substreams gui -e $(ENDPOINT) substreams.yaml db_out -s $(START_BLOCK) -t $(STOP_BLOCK)
 
 .PHONY: stream
 stream: build
